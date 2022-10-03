@@ -1,3 +1,9 @@
+#define USER '@'
+#define GHOST '$'
+#define EMPTY '.'
+#define WALL_VERTICAL '|'
+#define WALL_HORIZONTAL '-'
+
 struct map {
 	char** matrix;
 	int lines;
@@ -18,3 +24,7 @@ void readMap(MAP* m);
 void allocMemoryMap(MAP* m);
 void printMap(MAP* m);
 void findInMap(MAP* m, POSITION* p, char c);
+int isLimit(MAP* m, int x, int y);
+int positionIsEmpty(MAP* m, int x, int y);
+void walkingOnTheMap(MAP* m, int xOrigin, int yOrigin, int xDestiny, int yDestiny);
+void copyMap(MAP* destiny, MAP* origin);

@@ -1,6 +1,38 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "map.h"
+
+void copyMap(MAP* destiny, MAP* origin) {
+	destiny->lines = origin->lines;
+	destiny->columns = origin->columns;
+
+	allocMemoryMap(destiny);
+	for(int i = 0; i < origin->lines; i++) {
+		strcpy(destiny->matrix[i], origin->matrix[i]);
+	}
+}
+
+void walkingOnTheMap(MAP* m, int xOrigin, int yOrigin, int xDestiny, int yDestiny) {
+	char character = m->matrix[xOrigin][yOrigin];
+	m->matrix[xDestiny][yDestiny] = character;
+	m->matrix[xOrigin][yOrigin] = EMPTY;
+}
+
+int isLimit(MAP* m, int x, int y) {
+	if(x >= m->lines) {
+		return 0;
+	}
+	if(y >= m->columns){
+		return 0;
+	}
+
+	return 1;
+}
+
+int positionIsEmpty(MAP* m, int x, int y) {
+	return m->matrix[x][y] == EMPTY;
+}
 
 void findInMap(MAP* m, POSITION* p, char c) {
 	for(int i = 0; i < m->lines; i++) {

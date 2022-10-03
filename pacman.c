@@ -6,39 +6,71 @@
 MAP m;
 POSITION user;
 
+
+void ghosts() {
+	MAP copy;
+	copyMap(&copy, &m);
+
+	for(int i = 0; i < m.lines; i++) {
+		for(int j = 0; j < m.columns; j++) {
+			if(copy.matrix[i][j] == GHOST) {
+				if(isLimit(&m, i, j+1) && positionIsEmpty(&m, i, j+1)) {
+					walkingOnTheMap(&m, i, j, i, j+1);
+				}
+			}
+		}
+	}
+
+	freeMemoryMap(&copy);
+}
+
 int finishGame() {
 	return 0;
 }
 
-void move(char direction) {
-	int x;
-	int y;
+int isDirection(char direction) {
+	return direction == LEFT || direction == UP || direction == DOWN || direction == RIGHT;
+}
 
-	m.matrix[user.x][user.y] = '.';
+void move(char direction) {
+	if(!isDirection(direction)) {
+		return;
+	}
+
+	int proxX = user.x;
+	int proxY = user.y;
 
 	switch(direction) {
-		case 'a':
-			m.matrix[user.x][user.y-1] = '@';
-			user.y--;
+		case LEFT:
+			proxY--;
 			break;
-		case 'w':
-			m.matrix[user.x-1][user.y] = '@';
-			user.x--;
+		case UP:
+			proxX--;
 			break;
-		case 's':
-			m.matrix[user.x+1][user.y] = '@';
-			user.x++;
+		case DOWN:
+			proxX++;
 			break;
-		case 'd':
-			m.matrix[user.x][user.y+1] = '@';
-			user.y++;
+		case RIGHT:
+			proxY++;
 			break;
 	}
+
+	if(!isLimit(&m, proxX, proxY)) {
+		return;
+	}
+
+	if(!positionIsEmpty(&m, proxX, proxY)) {
+		return;
+	} 
+
+	walkingOnTheMap(&m, user.x, user.y, proxX, proxY);
+	user.x = proxX;
+	user.y = proxY;	
 }
 
 int main() {	
 	readMap(&m);
-	findInMap(&m, &user, '@');
+	findInMap(&m, &user, USER);
 
 	do {
 		printMap(&m);
@@ -46,6 +78,7 @@ int main() {
 		char command;
 		scanf(" %c", &command);
 		move(command);
+		ghosts();
 	} while(!finishGame());
 
 	freeMemoryMap(&m);
