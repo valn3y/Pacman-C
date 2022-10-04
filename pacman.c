@@ -3,6 +3,7 @@
 #include <time.h>
 #include "pacman.h"
 #include "map.h"
+#include "ui.h"
 
 MAP m;
 POSITION user;
@@ -53,8 +54,11 @@ void ghosts() {
 
 int finishGame() {
 	POSITION pos;
-	int foundUser = findInMap(&m, &pos, USER);
-	return !foundUser;
+
+	int lose = !findInMap(&m, &pos, USER);
+	int won = !findInMap(&m, &pos, GHOST);
+
+	return lose || won;
 }
 
 int isDirection(char direction) {
@@ -62,10 +66,6 @@ int isDirection(char direction) {
 }
 
 void move(char direction) {
-	if(!isDirection(direction)) {
-		return;
-	}
-
 	int proxX = user.x;
 	int proxY = user.y;
 
@@ -105,7 +105,7 @@ void explodesPill() {
 	explodesPill2(user.x, user.y, 0, 1, 3);
 	explodesPill2(user.x, user.y, 0, -1, 3);
 	explodesPill2(user.x, user.y, 1, 0, 3);
-	explodesPill2(user.x, user.y, -0, 0, 3);
+	explodesPill2(user.x, user.y, -1, 0, 3);
 
 	havePill = 0;
 }
@@ -134,13 +134,15 @@ int main() {
 	findInMap(&m, &user, USER);
 
 	do {
-		printf("Tem pilula: %s\n", (havePill ? "SIM" : "NAO"));
+		printf("Pilula: %s\n", (havePill ? "SIM" : "NAO"));
 		printMap(&m);
 
 		char command;
 		scanf(" %c", &command);
 
-		move(command);
+		if(isDirection(command)) {
+			move(command);
+		}
 
 		if(command == BOMB) {
 			explodesPill();

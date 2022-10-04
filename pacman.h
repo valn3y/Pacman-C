@@ -1,3 +1,6 @@
+#ifndef _PACMAN_H_
+#define _PACMAN_H_
+
 #define UP 'w'
 #define LEFT 'a'
 #define RIGHT 'd'
@@ -11,3 +14,5 @@ void ghosts();
 int whereGhostGo(int xOrigin, int yOrigin, int* xDestiny, int* yDestiny);
 void explodesPill();
 void explodesPill2(int x, int y, int sumX, int sumY, int quantity);
+
+#endif
