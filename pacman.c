@@ -1,11 +1,32 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "pacman.h"
 #include "map.h"
 
 MAP m;
 POSITION user;
 
+int whereGhostGo(int xOrigin, int yOrigin, int* xDestiny, int* yDestiny) {
+	int options[4][2] = {
+		{xOrigin, yOrigin + 1},
+		{xOrigin + 1, yOrigin},
+		{xOrigin, yOrigin - 1},
+		{xOrigin - 1, yOrigin}
+	};
+
+	srand(time(0));
+	for(int i = 0; i < 10; i++) {
+		int position = rand() % 4;
+		if(canWalk(&m, GHOST, options[position][0], options[position][1])) {
+			*xDestiny = options[position][0];
+			*yDestiny = options[position][1];
+			return 1;
+		}
+	}
+
+	return 0;
+}
 
 void ghosts() {
 	MAP copy;
@@ -14,8 +35,13 @@ void ghosts() {
 	for(int i = 0; i < m.lines; i++) {
 		for(int j = 0; j < m.columns; j++) {
 			if(copy.matrix[i][j] == GHOST) {
-				if(isLimit(&m, i, j+1) && positionIsEmpty(&m, i, j+1)) {
-					walkingOnTheMap(&m, i, j, i, j+1);
+				int xDestiny;
+				int yDestiny;
+
+				int found = whereGhostGo(i, j, &xDestiny, &yDestiny);
+
+				if(found) {
+					walkingOnTheMap(&m, i, j, xDestiny, yDestiny);
 				}
 			}
 		}
@@ -25,7 +51,9 @@ void ghosts() {
 }
 
 int finishGame() {
-	return 0;
+	POSITION pos;
+	int foundUser = findInMap(&m, &pos, USER);
+	return !foundUser;
 }
 
 int isDirection(char direction) {
@@ -55,13 +83,9 @@ void move(char direction) {
 			break;
 	}
 
-	if(!isLimit(&m, proxX, proxY)) {
+	if(!canWalk(&m, USER, proxX, proxY)) {
 		return;
 	}
-
-	if(!positionIsEmpty(&m, proxX, proxY)) {
-		return;
-	} 
 
 	walkingOnTheMap(&m, user.x, user.y, proxX, proxY);
 	user.x = proxX;

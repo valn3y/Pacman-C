@@ -3,6 +3,18 @@
 #include <string.h>
 #include "map.h"
 
+int isWall(MAP* m, int x, int y) {
+	return m->matrix[x][y] == WALL_VERTICAL || m->matrix[x][y] == WALL_HORIZONTAL;
+}
+
+int isCharacter(MAP* m, char character, int x, int y) {
+	return m->matrix[x][y] == character;
+}
+
+int canWalk(MAP* m, char character,int x, int y) {
+	return isLimit(m, x, y) && !isWall(m, x, y) && !isCharacter(m, character, x, y);
+}
+
 void copyMap(MAP* destiny, MAP* origin) {
 	destiny->lines = origin->lines;
 	destiny->columns = origin->columns;
@@ -34,16 +46,18 @@ int positionIsEmpty(MAP* m, int x, int y) {
 	return m->matrix[x][y] == EMPTY;
 }
 
-void findInMap(MAP* m, POSITION* p, char c) {
+int findInMap(MAP* m, POSITION* p, char c) {
 	for(int i = 0; i < m->lines; i++) {
 		for(int j = 0; j < m->columns; j++) {
 			if(m->matrix[i][j] == c) {
 				p->x = i;
 				p->y = j;
-				break;
+				return 1;
 			}
 		}
 	}
+
+	return 0;
 }
 
 void allocMemoryMap(MAP* m) {
