@@ -6,6 +6,7 @@
 
 MAP m;
 POSITION user;
+int havePill = 0;
 
 int whereGhostGo(int xOrigin, int yOrigin, int* xDestiny, int* yDestiny) {
 	int options[4][2] = {
@@ -87,9 +88,45 @@ void move(char direction) {
 		return;
 	}
 
+	if(isCharacter(&m, PILL, proxX, proxY)) {
+		havePill = 1;
+	}
+
 	walkingOnTheMap(&m, user.x, user.y, proxX, proxY);
 	user.x = proxX;
 	user.y = proxY;	
+}
+
+void explodesPill() {
+	if(!havePill) {
+		return;
+	}
+
+	explodesPill2(user.x, user.y, 0, 1, 3);
+	explodesPill2(user.x, user.y, 0, -1, 3);
+	explodesPill2(user.x, user.y, 1, 0, 3);
+	explodesPill2(user.x, user.y, -0, 0, 3);
+
+	havePill = 0;
+}
+
+void explodesPill2(int x, int y, int sumX, int sumY, int quantity) {
+	if(quantity == 0) {
+		return;
+	}
+
+	int newX = x + sumX;
+	int newY = y + sumY;
+
+	if(!isLimit(&m, newX, newY)) {
+		return;
+	}
+	if(isWall(&m, newX, newY)) {
+		return;
+	}
+
+	m.matrix[newX][newY] = EMPTY;
+	explodesPill2(newX, newY, sumX, sumY, quantity - 1);
 }
 
 int main() {	
@@ -97,11 +134,18 @@ int main() {
 	findInMap(&m, &user, USER);
 
 	do {
+		printf("Tem pilula: %s\n", (havePill ? "SIM" : "NAO"));
 		printMap(&m);
 
 		char command;
 		scanf(" %c", &command);
+
 		move(command);
+
+		if(command == BOMB) {
+			explodesPill();
+		}
+
 		ghosts();
 	} while(!finishGame());
 

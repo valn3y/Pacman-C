@@ -1,5 +1,6 @@
 #define USER '@'
 #define GHOST '$'
+#define PILL 'P'
 #define EMPTY '.'
 #define WALL_VERTICAL '|'
 #define WALL_HORIZONTAL '-'
